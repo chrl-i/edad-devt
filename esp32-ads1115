@@ -1,0 +1,39 @@
+#include <Wire.h>
+#include <Adafruit_ADS1X15.h>
+
+Adafruit_ADS1115 ads;
+
+void setup() {
+  Serial.begin(115200);  
+  Wire.begin();    
+
+  //check
+  if (!ads.begin()) {
+    Serial.println("Failed to initialize ADS1115.");
+    while (1);
+  }
+
+  ads.setGain(GAIN_ONE); 
+  // Other gain options:
+  // GAIN_TWOTHIRDS (±6.144V), GAIN_ONE (±4.096V), GAIN_TWO (±2.048V),
+  // GAIN_FOUR (±1.024V), GAIN_EIGHT (±0.512V), GAIN_SIXTEEN (±0.256V)
+
+  Serial.println("ADS1115 initialized successfully.");
+}
+
+void loop() {
+  int16_t adcValue = ads.readADC_SingleEnded(0); //channel
+
+  float voltage = ads.computeVolts(adcValue); //compute voltage
+
+  float current = voltage / 5e9;  //volt-current (change 5e9 to feedback val)
+
+  Serial.print("ADC Value: ");
+  Serial.print(adcValue);
+  Serial.print(" | Voltage (V): ");
+  Serial.print(voltage, 6);
+  Serial.print(" | Current (A): ");
+  Serial.println(current, 15);  //change decval to range
+
+  delay(1000); //calib to how fast qms switches
+}
